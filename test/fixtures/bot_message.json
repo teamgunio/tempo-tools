@@ -1,0 +1,18 @@
+{
+  "text": "",
+  "bot_id": "BAKGCQCKW",
+  "attachments": [
+    {
+      "fallback": "Failed:  davealma\"s build (<https://circleci.com/gh/xxx/xxx/869?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|#869>; push) in <https://circleci.com/gh/xxx/xxx?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|xxx/xxx> (<https://circleci.com/gh/xxx/xxx/tree/development?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|development>)\n - Task/rvl 234/league pages match (#114) (<https://github.com/xxx/xxx/commit/267b59072c3e7c1514788bdffdcf95cf899e1a3e|267b590> by swertfeger)\n\nActions: <https://circleci.com/actions/retry/github/xxx/xxx/869|Rebuild>\n",
+      "text": "Failed:  davealma\"s build (<https://circleci.com/gh/xxx/xxx/869?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|#869>; push) in <https://circleci.com/gh/xxx/xxx?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|xxx/xxx> (<https://circleci.com/gh/xxx/xxx/tree/development?utm_campaign=chatroom-integration&amp;utm_medium=referral&amp;utm_source=slack|development>)\n - Task/rvl 234/league pages match (#114) (<https://github.com/xxx/xxx/commit/267b59072c3e7c1514788bdffdcf95cf899e1a3e|267b590> by swertfeger)\n\nActions: <https://circleci.com/actions/retry/github/xxx/xxx/869|Rebuild>\n",
+      "id": 1,
+      "color": "d10c20"
+    }
+  ],
+  "type": "message",
+  "subtype": "bot_message",
+  "team": "T026JGFVC",
+  "channel": "GA4V34CEL",
+  "event_ts": "1531419851.000304",
+  "ts": "1531419851.000304"
+}

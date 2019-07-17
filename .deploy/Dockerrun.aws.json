@@ -1,0 +1,43 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "tempo-tools",
+      "image": "dermidgen/tempo-tools:%BUILD_NUM%",
+      "environment": [
+        {
+          "name": "CLIENT_ID",
+          "value": "%CLIENT_ID%"
+        },
+        {
+          "name": "CLIENT_SECRET",
+          "value": "%CLIENT_SECRET%"
+        },
+        {
+          "name": "CLIENT_TOKEN",
+          "value": "%CLIENT_TOKEN%"
+        },
+        {
+          "name": "CHANNEL",
+          "value": "%CHANNEL%"
+        },
+        {
+          "name": "HOST_PORT",
+          "value": "3000"
+        }
+      ],
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000
+        },
+        {
+          "hostPort": 443,
+          "containerPort": 3000
+        }
+      ]
+    }
+  ]
+}
