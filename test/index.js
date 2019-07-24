@@ -101,10 +101,18 @@ describe('Web Server', () => {
       .expect(403, done);
   });
 
-  it('should output worklogs with a token', done => {
+  it.skip('should output worklogs with a token', done => {
     request(server)
       .post('/report/download')
       .send({ token: '1234' })
       .expect(200, done);
   }).timeout(30000);
+
+  it('should update a report in Google Sheets', done => {
+    request(server)
+      .post('/report/update')
+      .send({ token: '1234' })
+      .expect(200, done);
+  }).timeout(30000);
+
 });
