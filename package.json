@@ -4,15 +4,11 @@
   "description": "Tools for interacting with Tempo for management & reporting",
   "main": "index.js",
   "scripts": {
-    "build": "babel lib -d dist",
     "ops:gcloud:config": "gcloud config set compute/zone us-central1-a; gcloud config set compute/region us-central; gcloud config set project gunio-tools",
     "ops:gcloud:connect": "gcloud config configurations activate gunio-tools && gcloud auth configure-docker",
     "ops:gcloud:setup": "gcloud config configurations create gunio-tools && gcloud auth login && npm run ops:gcloud:config",
-    "testx": "mocha --require @babel/register",
     "test": "mocha test/*.test.js --timeout=20000",
-    "release": "standard-version",
-    "start": "nodemon lib/index.js --exec babel-node",
-    "serve": "node dist/index.js"
+    "release": "standard-version"
   },
   "engines": {
     "node": ">=10.16.0"
@@ -32,26 +28,14 @@
   },
   "homepage": "https://github.com/teamgunio/tempo-tools#readme",
   "devDependencies": {
-    "@babel/cli": "^7.5.0",
-    "@babel/core": "^7.5.4",
-    "@babel/node": "^7.5.0",
-    "@babel/plugin-transform-runtime": "^7.5.0",
-    "@babel/preset-env": "^7.5.4",
-    "@babel/register": "^7.4.4",
-    "@babel/runtime": "^7.5.4",
     "@google-cloud/nodejs-repo-tools": "^3.3.0",
+    "mocha": "^6.1.4",
     "proxyquire": "^2.1.0",
     "sinon": "^7.2.7",
-    "mocha": "^6.1.4",
-    "nodemon": "^1.19.1",
-    "supertest": "^4.0.2"
+    "standard-version": "^6.0.1"
   },
   "dependencies": {
-    "@slack/rtm-api": "^5.0.1",
-    "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
-    "express": "^4.17.1",
-    "fast-xml-parser": "^3.12.17",
     "googleapis": "^39.2.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7"
