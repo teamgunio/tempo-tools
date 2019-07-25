@@ -26,3 +26,20 @@ Every time it runs
 --------------
 
 Notifications should based off the total budget
+
+
+-----
+
+Start total hours from Jan 1 2019
+
+slack notification Mon/Friday report to post to slack channel - balance / hours remaining
+slack notification for threshold alerts
+
+slack command for instant report on balance / hours remaining
+
+slack command for CSV dump
+slack command to get PDF tempo report
+
+slack command to get PDF tempo report by Account & Date Range User -> Issue -> Worklog
+ * Restrict by [gun.io full members - no multi/single channel guests]
+ * Contrain to DM or managment channel

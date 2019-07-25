@@ -1,0 +1,10 @@
+.gcloudignore
+.git
+.gitignore
+.babelrc
+.env
+.env.distrib
+.jshintrc
+.nvmrc
+
+node_modules
