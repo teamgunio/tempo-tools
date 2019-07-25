@@ -4,15 +4,17 @@ const {
   SLACK_TOKEN,
 } = process.env
 
+const EVENT_TOPIC = 'projects/gunio-tools/topics/tempo-tools'
+
 const {
   getAccounts,
   getWorklogs,
 } = require('./lib/tempo')
 
-// const {
-//   getReport,
-//   updateReport,
-// } = require('./lib/sheets')
+const {
+  getReport,
+  updateReport,
+} = require('./lib/sheets')
 
 const buildSlackMessage = (text, attachments=[]) => {
   const slackMessage = {
@@ -32,8 +34,17 @@ const validateSlackCommand = (body) => {
   }
 
   if (!body.command) {
-    const error = new Error('Method not allowed')
-    throw error
+    throw new Error('Method not allowed')
+  }
+}
+
+const validateEvent = (event, context) => {
+  if (!context || !context.resource || context.resource.name !== EVENT_TOPIC) {
+    throw new Error('Invalid event resource')
+  }
+
+  if (!event || !event.data) {
+    throw new Error('Invalid event data')
   }
 }
 
@@ -55,9 +66,71 @@ const slackCommands = async (req, res) => {
   }
 }
 
-const updateSheets = async (pubSubEvent, context) => {
-  // const report = await getReport()
+const updateSheets = async (event, context, callback) => {
   console.log('Syncing Sheets with latest data from Tempo')
+
+  try {
+    validateEvent(event, context)
+
+    const command = Buffer.from(event.data, 'base64').toString()
+
+    console.log(`Handling command ${command}`)
+
+    const compiled = {}
+    const accounts = (await getAccounts()).results
+    const worklogs = (await getWorklogs()).results
+
+    accounts.map(async account => {
+      const logs = worklogs.filter(l => {
+        if (!l.attributes.values.length) {
+          return l.issue.key.split('-')[0] === account.key
+        }
+
+        return l.attributes.values[0].value === account.key
+      })
+      account.billings = logs.length ? logs.map(log => log.billableSeconds).reduce((a, c) => a + c) : 0
+      account.billings = (account.billings > 0) ? ((account.billings/60)/60) : 0
+
+      compiled[account.key] = {
+        lead: account.lead.displayName,
+        billings: account.billings,
+      }
+
+      return account
+    })
+    console.log(compiled)
+
+    // const update = report.map(record => {
+    //   const [
+    //     key,
+    //     lead,
+    //     balance,
+    //     tbilled,
+    //     lpurchase,
+    //     billed,
+    //     dpurchase,
+    //   ] = record
+
+    //   const worklog = worklogs[key]
+
+    //   return [
+    //     key,
+    //     worklog.lead,
+    //     basis,
+    //     tbudget,
+    //     worklog.monthly_budget,
+    //     worklog.billings,
+    //     remaining,
+    //     active
+    //   ]
+    // })
+
+    callback()
+  } catch(err) {
+    console.error(err)
+    callback(err)
+  }
+
 }
 
 exports = module.exports = {
