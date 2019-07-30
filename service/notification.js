@@ -66,6 +66,50 @@ const accountThresholdNotification = async (level='inform') => {
   }))
 }
 
+const accountUpdateNotification = async () => {
+  const report = await getReport('Sheet1!A2:K')
+  const eligible = report.filter(r => r[10]).map(r => [
+    r[0],
+    r[1],
+    Number(r[2]),
+    Number(r[3]),
+    Number(r[4]),
+    Number(r[5]),
+    r[6],
+    Number(r[7]),
+    Number(r[8]),
+    Number(r[9]),
+    r[10]
+  ])
+
+  await Promise.all(eligible.map(async record => {
+    const [
+      key,
+      lead,
+      balance,
+      tbilled,
+      lpurchase,
+      billed,
+      dpurchase,
+      inform,
+      warn,
+      alert,
+      channelName,
+    ] = record
+    const channel = await getChannel(channelName)
+
+    const message = buildSlackMessage(`Tempo Update:
+      Account: ${key}
+      Lead: ${lead}
+      Hours Remaining: ${balance}
+      Hours Billed Since Last Purchase: ${billed}
+    `)
+    
+    await postMessage(channel.id, message)
+  }))
+}
+
 module.exports = {
   accountThresholdNotification,
+  accountUpdateNotification,
 }

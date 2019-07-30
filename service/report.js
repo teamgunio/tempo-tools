@@ -1,3 +1,5 @@
+const request = require('request-promise-native')
+
 const {
   firestore
 } = require('../lib/firestore')
@@ -6,6 +8,10 @@ const {
   getReport,
   updateReport,
 } = require('../lib/sheets')
+
+const {
+  buildSlackMessage,
+} = require('../lib/slack')
 
 const sheetsReport = async () => {
   const report = await getReport('Sheet1!A2:G')
@@ -60,6 +66,80 @@ const sheetsReport = async () => {
   await updateReport('Sheet1!F2', billings)
 }
 
+const slackReport = async (req, res) => {
+  const {
+    token,
+    channel_name,
+    command,
+    text,
+    response_url,
+  } = req.body;
+
+  let accountKey = '';
+
+  // Check to see if we're in a client dev channel
+  // If not, we'll need a user specified Account Key
+  if (channel_name.indexOf('-dev') > -1) {
+    accountKey = channel_name.split('-').shift().toUpperCase();
+  } else if (text) {
+    accountKey = text.toUpperCase();
+  } else {
+    return res.status(200)
+      .send(`You're not in a dev channel, please specify an Account Key`);
+  }
+
+  // Respond immediately
+  res.status(200)
+    .send(`Fetching update for ${accountKey}...`);
+
+  if (response_url) {
+    const report = await getReport('Sheet1!A2:K')
+    const [eligible] = report.filter(r => r[0] === accountKey).map(r => [
+      r[0],
+      r[1],
+      Number(r[2]),
+      Number(r[3]),
+      Number(r[4]),
+      Number(r[5]),
+      r[6],
+      Number(r[7]),
+      Number(r[8]),
+      Number(r[9]),
+      r[10]
+    ])
+
+    const [
+      key,
+      lead,
+      balance,
+      tbilled,
+      lpurchase,
+      billed,
+      dpurchase,
+      inform,
+      warn,
+      alert,
+      channelName,
+    ] = eligible
+
+    const message = buildSlackMessage(`Tempo Update:
+      Account: ${key}
+      Lead: ${lead}
+      Hours Remaining: ${balance}
+      Hours Billed Since Last Purchase: ${billed}
+    `)
+
+    await request.post({
+      uri: response_url,
+      json: {
+        ...req.body,
+        ...message,
+      },
+    })
+  }
+}
+
 module.exports = {
   sheetsReport,
+  slackReport,
 }

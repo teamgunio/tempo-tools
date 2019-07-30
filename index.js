@@ -7,34 +7,21 @@ const {
 const EVENT_TOPIC = 'projects/gunio-tools/topics/tempo-tools'
 
 const {
-  getAccounts,
-  getWorklogs,
-} = require('./lib/tempo')
-
-const {
-  getReport,
-  updateReport,
-} = require('./lib/sheets')
-
-const {
-  buildSlackMessage,
-  report,
-} = require('./lib/slack')
-
-const {
   syncAccounts,
   syncWorklogs,
 } = require('./service/sync')
 
 const {
   sheetsReport,
+  slackReport,
 } = require('./service/report')
 
 const {
   accountThresholdNotification,
+  accountUpdateNotification,
 } = require('./service/notification')
 
-const commands = ['/tempo-reconcile']
+const commands = ['/tempo-report']
 
 const validateSlackCommand = (body) => {
   if (!body || body.token !== SLACK_TOKEN) {
@@ -66,10 +53,13 @@ const slackCommands = async (req, res) => {
     validateSlackCommand(req.body)
 
     const { command } = req.body
-    if (command === '/tempo-reconcile') {
-      await report(req, res)
+    console.log(`Handling command ${command}`)
+
+    switch(command) {
+      case '/tempo-report':
+        await slackReport(req, res)
+      break
     }
-    
 
   } catch(err) {
     console.error(err);
@@ -93,6 +83,9 @@ const pubsubHandler = async (event, context, callback) => {
       break
       case 'report-sheets':
         await sheetsReport()
+      break
+      case 'notifications-update':
+        await accountUpdateNotification()
       break
       case 'notifications-inform':
         await accountThresholdNotification('inform')
