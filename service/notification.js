@@ -9,8 +9,9 @@ const {
   postMessage,
 } = require('../lib/slack')
 
+getChannels() // prime memory with Slack channels
+
 const accountThresholdNotification = async (level='inform') => {
-  await getChannels() // prime memory with Slack channels
   const report = await getReport('Sheet1!A2:J')
   const eligible = report.map(r => [
     r[0],
@@ -72,7 +73,6 @@ const accountThresholdNotification = async (level='inform') => {
 }
 
 const accountUpdateNotification = async () => {
-  await getChannels() // prime memory with Slack channels
   const report = await getReport('Sheet1!A2:J')
   const eligible = report.map(r => [
     r[0],
