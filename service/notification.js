@@ -3,14 +3,16 @@ const {
 } = require('../lib/sheets')
 
 const {
-  getChannel,
+  getChannels,
+  getAccountChannels,
   buildSlackMessage,
   postMessage,
 } = require('../lib/slack')
 
 const accountThresholdNotification = async (level='inform') => {
-  const report = await getReport('Sheet1!A2:K')
-  const eligible = report.filter(r => r[10]).map(r => [
+  await getChannels() // prime memory with Slack channels
+  const report = await getReport('Sheet1!A2:J')
+  const eligible = report.map(r => [
     r[0],
     r[1],
     Number(r[2]),
@@ -21,7 +23,6 @@ const accountThresholdNotification = async (level='inform') => {
     Number(r[7]),
     Number(r[8]),
     Number(r[9]),
-    r[10]
   ])
 
   let list = []
@@ -51,9 +52,12 @@ const accountThresholdNotification = async (level='inform') => {
       inform,
       warn,
       alert,
-      channelName,
     ] = record
-    const channel = await getChannel(channelName)
+
+    if (!key) return
+
+    const channels = await getAccountChannels(key)
+    if (!channels) return
 
     const message = buildSlackMessage(`This account has exceeded the threshold:
       Account: ${key}
@@ -62,13 +66,15 @@ const accountThresholdNotification = async (level='inform') => {
       Hours Billed Since Last Purchase: ${billed}
     `)
     
-    await postMessage(channel.id, message)
+    if (channels.dev) await postMessage(channels.dev.id, message)
+    if (channels.prod) await postMessage(channels.prod.id, message)
   }))
 }
 
 const accountUpdateNotification = async () => {
-  const report = await getReport('Sheet1!A2:K')
-  const eligible = report.filter(r => r[10]).map(r => [
+  await getChannels() // prime memory with Slack channels
+  const report = await getReport('Sheet1!A2:J')
+  const eligible = report.map(r => [
     r[0],
     r[1],
     Number(r[2]),
@@ -79,7 +85,6 @@ const accountUpdateNotification = async () => {
     Number(r[7]),
     Number(r[8]),
     Number(r[9]),
-    r[10]
   ])
 
   await Promise.all(eligible.map(async record => {
@@ -94,9 +99,12 @@ const accountUpdateNotification = async () => {
       inform,
       warn,
       alert,
-      channelName,
     ] = record
-    const channel = await getChannel(channelName)
+
+    if (!key) return
+
+    const channels = await getAccountChannels(key)
+    if (!channels) return
 
     const message = buildSlackMessage(`Tempo Update:
       Account: ${key}
@@ -105,7 +113,8 @@ const accountUpdateNotification = async () => {
       Hours Billed Since Last Purchase: ${billed}
     `)
     
-    await postMessage(channel.id, message)
+    if (channels.dev) await postMessage(channels.dev.id, message)
+    if (channels.prod) await postMessage(channels.prod.id, message)
   }))
 }
 

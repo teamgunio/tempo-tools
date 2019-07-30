@@ -80,17 +80,17 @@ const slackReport = async (req, res) => {
   // Check to see if we're in a client dev channel
   // If not, we'll need a user specified Account Key
   if (channel_name.indexOf('-dev') > -1) {
-    accountKey = channel_name.split('-').shift().toUpperCase();
+    accountKey = channel_name.split('-').shift().toUpperCase()
   } else if (text) {
-    accountKey = text.toUpperCase();
+    accountKey = text.toUpperCase()
   } else {
     return res.status(200)
-      .send(`You're not in a dev channel, please specify an Account Key`);
+      .send(`You're not in a dev channel, please specify an Account Key`)
   }
 
   // Respond immediately
   res.status(200)
-    .send(`Fetching update for ${accountKey}...`);
+    .write(`Fetching update for ${accountKey}...`)
 
   if (response_url) {
     const report = await getReport('Sheet1!A2:K')
@@ -137,6 +137,8 @@ const slackReport = async (req, res) => {
       },
     })
   }
+
+  res.end()
 }
 
 module.exports = {

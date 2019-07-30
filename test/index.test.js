@@ -94,7 +94,7 @@ const makeEventData = (strData) => {
 // beforeEach(tools.stubConsole)
 // afterEach(tools.restoreConsole)
 
-describe.skip('PubSub Handler', () => {
+describe('PubSub Handler', () => {
   it('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
@@ -125,7 +125,7 @@ describe.skip('PubSub Handler', () => {
     }
   })
 
-  it.skip('Handles the sync-tempo command', async () => {
+  it('Handles the sync-tempo command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
@@ -138,7 +138,7 @@ describe.skip('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it.skip('Handles the report-sheets command', async () => {
+  it('Handles the report-sheets command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -150,7 +150,7 @@ describe.skip('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-inform command', async () => {
+  it.skip('Handles the notifications-inform command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -162,7 +162,7 @@ describe.skip('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-warn command', async () => {
+  it.skip('Handles the notifications-warn command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -174,7 +174,7 @@ describe.skip('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-alert command', async () => {
+  it.skip('Handles the notifications-alert command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -186,7 +186,7 @@ describe.skip('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-update command', async () => {
+  it.skip('Handles the notifications-update command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -199,7 +199,7 @@ describe.skip('PubSub Handler', () => {
   })
 })
 
-describe('Slack command handler', () => {
+describe.skip('Slack command handler', () => {
   it('Send fails if not a POST request', async () => {
     const error = new Error('Method not allowed')
     error.code = 405
@@ -264,7 +264,7 @@ describe('Slack command handler', () => {
   })
 })
 
-describe('Slack tempo-report command', () => {
+describe.skip('Slack tempo-report command', () => {
   it.skip('Handles search error', async () => {
     const error = new Error('error')
     const mocks = getMocks()

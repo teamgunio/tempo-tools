@@ -9,7 +9,7 @@
     "ops:gcloud:setup": "gcloud config configurations create gunio-tools && gcloud auth login && npm run ops:gcloud:config",
     "publish:slackHandler": "gcloud functions deploy tempo-tools --entry-point slackCommands --runtime nodejs10 --trigger-http",
     "publish:pubsubHandler": "gcloud functions deploy tempo-tools-event-handler --entry-point pubsubHandler --runtime nodejs10 --trigger-topic tempo-tools",
-    "publish": "npm publish:slackHandler && npm run publish:pubsubHandler",
+    "publish": "npm run publish:slackHandler && npm run publish:pubsubHandler",
     "test": "mocha test/*.test.js --timeout=20000",
     "release": "standard-version"
   },

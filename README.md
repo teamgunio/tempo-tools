@@ -36,6 +36,7 @@ slack notification Mon/Friday report to post to slack channel - balance / hours 
 slack notification for threshold alerts
 
 slack command for instant report on balance / hours remaining
+ * Constrain to matching dev/prod channel
 
 slack command for CSV dump
 slack command to get PDF tempo report
@@ -43,3 +44,89 @@ slack command to get PDF tempo report
 slack command to get PDF tempo report by Account & Date Range User -> Issue -> Worklog
  * Restrict by [gun.io full members - no multi/single channel guests]
  * Contrain to DM or managment channel
+
+
+-------
+
+## Update [grey]
+
+ * Runs every Monday at 0900 PST & Friday at 1400 PST
+
+Template:
+```
+Tempo Update:
+     Account: DNV
+     Lead: Tyler Newkirk
+     Last Purchased Date: 1-1-2019
+     Hours Last Purchased: 1400
+     Hours Billed Since Last Purchase: 1364
+     Hours Remaining: 86
+```
+
+## Info [yellow]
+
+ * Runs every Monday at 0900 PST
+
+Template:
+```
+This account has exceeded the threshold:
+     Account: DNV
+     Lead: Tyler Newkirk
+     Last Purchased Date: 1-1-2019
+     Hours Last Purchased: 1400
+     Hours Billed Since Last Purchase: 1364
+     Hours Remaining: 86
+```
+
+## Warn [orange]
+
+ * Runs every Monday at 0900 PST
+
+Template:
+```
+This account has exceeded the threshold:
+     Account: DNV
+     Lead: Tyler Newkirk
+     Last Purchased Date: 1-1-2019
+     Hours Last Purchased: 1400
+     Hours Billed Since Last Purchase: 1364
+     Hours Remaining: 86
+```
+
+## Alert [orange]
+
+ * Runs every Monday at 0900 PST
+
+Template:
+```
+This account has exceeded the threshold:
+     Account: DNV
+     Lead: Tyler Newkirk
+     Last Purchased Date: 1-1-2019
+     Hours Last Purchased: 1400
+     Hours Billed Since Last Purchase: 1364
+     Hours Remaining: 86
+```
+
+## Empty Alert [red]
+
+ * Runs every Monday at 0900 PST
+
+Template:
+```
+This account has exceeded the threshold:
+     Account: DNV
+     Lead: Tyler Newkirk
+     Last Purchased Date: 1-1-2019
+     Hours Last Purchased: 1400
+     Hours Billed Since Last Purchase: 1364
+     Hours Remaining: 86
+```
+
+-------
+
+10% run once a week
+
+new scheduled job - every 48h - when balance is 0 or less than 0
+
+restrict slack command for report
