@@ -7,7 +7,7 @@
     "ops:gcloud:config": "gcloud config set compute/zone us-central1-a; gcloud config set compute/region us-central; gcloud config set project gunio-tools",
     "ops:gcloud:connect": "gcloud config configurations activate gunio-tools && gcloud auth configure-docker",
     "ops:gcloud:setup": "gcloud config configurations create gunio-tools && gcloud auth login && npm run ops:gcloud:config",
-    "publish:slackHandler": "gcloud functions deploy tempo-tools --entry-point slackCommands --runtime nodejs10 --trigger-http",
+    "publish:slackHandler": "gcloud functions deploy tempo-tools-slack-command --entry-point slackCommands --runtime nodejs10 --trigger-http",
     "publish:pubsubHandler": "gcloud functions deploy tempo-tools-event-handler --entry-point pubsubHandler --runtime nodejs10 --trigger-topic tempo-tools",
     "publish": "npm run publish:slackHandler && npm run publish:pubsubHandler",
     "test": "mocha test/*.test.js --timeout=20000",

@@ -94,7 +94,7 @@ const makeEventData = (strData) => {
 // beforeEach(tools.stubConsole)
 // afterEach(tools.restoreConsole)
 
-describe('PubSub Handler', () => {
+describe.skip('PubSub Handler', () => {
   it('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
@@ -264,7 +264,7 @@ describe.skip('Slack command handler', () => {
   })
 })
 
-describe.skip('Slack tempo-report command', () => {
+describe('Slack tempo-report command', () => {
   it.skip('Handles search error', async () => {
     const error = new Error('error')
     const mocks = getMocks()
@@ -296,7 +296,10 @@ describe.skip('Slack tempo-report command', () => {
 
     mocks.req.method = method
     mocks.req.body.token = SLACK_TOKEN
-    mocks.req.body.channel_name = '2342512'
+    mocks.req.body.channel_id = 'GLRP2KR2A'
+    mocks.req.body.channel_name = 'privategroup'
+    mocks.req.body.user_id = 'U03UE1N22'
+    mocks.req.body.user_name = 'dermidgen'
     mocks.req.body.command = '/tempo-report'
     mocks.req.body.text = query
     sample.mocks.worklogs.yields(null, {

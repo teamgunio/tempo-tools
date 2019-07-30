@@ -10,6 +10,7 @@ const {
 } = require('../lib/sheets')
 
 const {
+  getChannelById,
   buildSlackMessage,
 } = require('../lib/slack')
 
@@ -69,76 +70,72 @@ const sheetsReport = async () => {
 const slackReport = async (req, res) => {
   const {
     token,
+    channel_id,
     channel_name,
     command,
     text,
     response_url,
+    user_name,
+    user_id,
   } = req.body;
 
-  let accountKey = '';
+  // We can't rely on channel_name for private channels
+  const channel = await getChannelById(channel_id)
+  console.log(`Tempo report request from ${user_name}|${user_id} on ${channel.name}|${channel_id}`)
 
-  // Check to see if we're in a client dev channel
-  // If not, we'll need a user specified Account Key
-  if (channel_name.indexOf('-dev') > -1) {
-    accountKey = channel_name.split('-').shift().toUpperCase()
-  } else if (text) {
-    accountKey = text.toUpperCase()
-  } else {
+  if (!/-(dev|prod)$/i.test(channel.name)) 
     return res.status(200)
-      .send(`You're not in a dev channel, please specify an Account Key`)
-  }
+      .send(`Tempo report is not available for this channel`)
 
-  // Respond immediately
-  res.status(200)
-    .write(`Fetching update for ${accountKey}...`)
+  const accountKey = channel.name.split('-').shift().toUpperCase()
+  console.log(`Building report for ${accountKey}`)
+
+  const report = await getReport('Sheet1!A2:J')
+  const [eligible] = report.filter(r => r[0] === accountKey).map(r => [
+    r[0],
+    r[1],
+    Number(r[2]),
+    Number(r[3]),
+    Number(r[4]),
+    Number(r[5]),
+    r[6],
+    Number(r[7]),
+    Number(r[8]),
+    Number(r[9]),
+  ])
+
+  const [
+    key,
+    lead,
+    balance,
+    tbilled,
+    lpurchase,
+    billed,
+    dpurchase,
+    inform,
+    warn,
+    alert,
+  ] = eligible
+
+  const message = buildSlackMessage(`Tempo Update:
+    Account: ${key}
+    Lead: ${lead}
+    Hours Remaining: ${balance}
+    Hours Billed Since Last Purchase: ${billed}
+  `)
 
   if (response_url) {
-    const report = await getReport('Sheet1!A2:K')
-    const [eligible] = report.filter(r => r[0] === accountKey).map(r => [
-      r[0],
-      r[1],
-      Number(r[2]),
-      Number(r[3]),
-      Number(r[4]),
-      Number(r[5]),
-      r[6],
-      Number(r[7]),
-      Number(r[8]),
-      Number(r[9]),
-      r[10]
-    ])
-
-    const [
-      key,
-      lead,
-      balance,
-      tbilled,
-      lpurchase,
-      billed,
-      dpurchase,
-      inform,
-      warn,
-      alert,
-      channelName,
-    ] = eligible
-
-    const message = buildSlackMessage(`Tempo Update:
-      Account: ${key}
-      Lead: ${lead}
-      Hours Remaining: ${balance}
-      Hours Billed Since Last Purchase: ${billed}
-    `)
-
-    await request.post({
+    request.post({
       uri: response_url,
       json: {
+        response_type: 'in_channel',
         ...req.body,
         ...message,
       },
     })
   }
 
-  res.end()
+  res.status(200).send()
 }
 
 module.exports = {
