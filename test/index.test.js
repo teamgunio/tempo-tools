@@ -91,16 +91,24 @@ const makeEventData = (strData) => {
   return Buffer.from(strData).toString('base64')
 }
 
-// beforeEach(tools.stubConsole)
-// afterEach(tools.restoreConsole)
+beforeEach(tools.stubConsole)
+afterEach(tools.restoreConsole)
+
+describe.skip('PubSub Handler', () => {
+  it('Call the handler', async () => {
+    const sample = getSample()
+    const mocks = getMocks()
+    const command = 'sync'
+    mocks.cmd.data = makeEventData(command)
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+  })
+})
 
 describe('Sheets update handler', () => {
   it('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
     const mocks = getMocks()
-
-    mocks.event.context.resource.name = 'wrong'
 
     try {
       await sample.program.updateSheets(mocks.cmd, mocks.event.context, mocks.event.callback)

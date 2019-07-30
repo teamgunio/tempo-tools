@@ -1,10 +1,11 @@
-.gcloudignore
-.git
-.gitignore
 .babelrc
 .env
 .env.distrib
+.gcloudignore
+.git
+.gitignore
 .jshintrc
 .nvmrc
 
 node_modules
+test

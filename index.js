@@ -16,15 +16,21 @@ const {
   updateReport,
 } = require('./lib/sheets')
 
-const buildSlackMessage = (text, attachments=[]) => {
-  const slackMessage = {
-    response_type: 'in_channel',
-    text,
-    attachments,
-  }
+const {
+  buildSlackMessage,
+  report,
+} = require('./lib/slack')
 
-  return slackMessage
-}
+const {
+  syncAccounts,
+  syncWorklogs,
+} = require('./service/sync')
+
+const {
+  sheetsReport,
+} = require('./service/report')
+
+const commands = ['/tempo-reconcile']
 
 const validateSlackCommand = (body) => {
   if (!body || body.token !== SLACK_TOKEN) {
@@ -33,7 +39,8 @@ const validateSlackCommand = (body) => {
     throw error
   }
 
-  if (!body.command) {
+  if (!body.command || !commands.includes(body.command)) {
+    console.log(`Slack attempted command: ${body.command}`)
     throw new Error('Method not allowed')
   }
 }
@@ -54,15 +61,36 @@ const slackCommands = async (req, res) => {
   try {
     validateSlackCommand(req.body)
 
-    const accounts = await getAccounts()
-    const worklogs = await getWorklogs('HBY')
+    const { command } = req.body
+    if (command === '/tempo-reconcile') {
+      await report(req, res)
+    }
+    
 
-    const message = buildSlackMessage('Worklogs report', worklogs.results)
-
-    res.status(200).json(message)
   } catch(err) {
     console.error(err);
     res.status(err.code || 500).send(err);
+  }
+}
+
+const pubsubHandler = async (event, context, callback) => {
+  console.log('Running sync handler')
+
+  try {
+    validateEvent(event, context)
+
+    const command = Buffer.from(event.data, 'base64').toString()
+    console.log(`Handling command ${command}`)
+
+    if (command === 'sync') {
+      await syncAccounts()
+      await syncWorklogs()
+    }
+
+    callback()
+  } catch(err) {
+    console.error(err)
+    callback(err)
   }
 }
 
@@ -73,57 +101,11 @@ const updateSheets = async (event, context, callback) => {
     validateEvent(event, context)
 
     const command = Buffer.from(event.data, 'base64').toString()
-
     console.log(`Handling command ${command}`)
 
-    const compiled = {}
-    const accounts = (await getAccounts()).results
-    const worklogs = (await getWorklogs()).results
-
-    accounts.map(async account => {
-      const logs = worklogs.filter(l => {
-        if (!l.attributes.values.length) {
-          return l.issue.key.split('-')[0] === account.key
-        }
-
-        return l.attributes.values[0].value === account.key
-      })
-      account.billings = logs.length ? logs.map(log => log.billableSeconds).reduce((a, c) => a + c) : 0
-      account.billings = (account.billings > 0) ? ((account.billings/60)/60) : 0
-
-      compiled[account.key] = {
-        lead: account.lead.displayName,
-        billings: account.billings,
-      }
-
-      return account
-    })
-    console.log(compiled)
-
-    // const update = report.map(record => {
-    //   const [
-    //     key,
-    //     lead,
-    //     balance,
-    //     tbilled,
-    //     lpurchase,
-    //     billed,
-    //     dpurchase,
-    //   ] = record
-
-    //   const worklog = worklogs[key]
-
-    //   return [
-    //     key,
-    //     worklog.lead,
-    //     basis,
-    //     tbudget,
-    //     worklog.monthly_budget,
-    //     worklog.billings,
-    //     remaining,
-    //     active
-    //   ]
-    // })
+    if (command === 'sync') {
+      await sheetsReport()
+    }
 
     callback()
   } catch(err) {
@@ -135,5 +117,6 @@ const updateSheets = async (event, context, callback) => {
 
 exports = module.exports = {
   slackCommands,
+  pubsubHandler,
   updateSheets,
 }
