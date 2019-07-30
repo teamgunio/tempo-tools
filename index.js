@@ -30,6 +30,10 @@ const {
   sheetsReport,
 } = require('./service/report')
 
+const {
+  accountThresholdNotification,
+} = require('./service/notification')
+
 const commands = ['/tempo-reconcile']
 
 const validateSlackCommand = (body) => {
@@ -82,9 +86,23 @@ const pubsubHandler = async (event, context, callback) => {
     const command = Buffer.from(event.data, 'base64').toString()
     console.log(`Handling command ${command}`)
 
-    if (command === 'sync') {
-      await syncAccounts()
-      await syncWorklogs()
+    switch(command) {
+      case 'sync-tempo':
+        await syncAccounts()
+        await syncWorklogs()
+      break
+      case 'report-sheets':
+        await sheetsReport()
+      break
+      case 'notifications-inform':
+        await accountThresholdNotification('inform')
+      break
+      case 'notifications-warn':
+        await accountThresholdNotification('warn')
+      break
+      case 'notifications-alert':
+        await accountThresholdNotification('alert')
+      break
     }
 
     callback()
@@ -92,31 +110,9 @@ const pubsubHandler = async (event, context, callback) => {
     console.error(err)
     callback(err)
   }
-}
-
-const updateSheets = async (event, context, callback) => {
-  console.log('Syncing Sheets with latest data from Tempo')
-
-  try {
-    validateEvent(event, context)
-
-    const command = Buffer.from(event.data, 'base64').toString()
-    console.log(`Handling command ${command}`)
-
-    if (command === 'sync') {
-      await sheetsReport()
-    }
-
-    callback()
-  } catch(err) {
-    console.error(err)
-    callback(err)
-  }
-
 }
 
 exports = module.exports = {
   slackCommands,
   pubsubHandler,
-  updateSheets,
 }

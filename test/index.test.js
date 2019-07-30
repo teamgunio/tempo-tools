@@ -91,27 +91,17 @@ const makeEventData = (strData) => {
   return Buffer.from(strData).toString('base64')
 }
 
-beforeEach(tools.stubConsole)
-afterEach(tools.restoreConsole)
+// beforeEach(tools.stubConsole)
+// afterEach(tools.restoreConsole)
 
-describe.skip('PubSub Handler', () => {
-  it('Call the handler', async () => {
-    const sample = getSample()
-    const mocks = getMocks()
-    const command = 'sync'
-    mocks.cmd.data = makeEventData(command)
-    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
-  })
-})
-
-describe('Sheets update handler', () => {
+describe('PubSub Handler', () => {
   it('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
     const mocks = getMocks()
 
     try {
-      await sample.program.updateSheets(mocks.cmd, mocks.event.context, mocks.event.callback)
+      await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
     } catch(err) {
       assert.strictEqual(mocks.event.callback.callCount, 1)
       assert.deepStrictEqual(mocks.event.callback.firstCall.args, [error])
@@ -126,7 +116,7 @@ describe('Sheets update handler', () => {
     const mocks = getMocks()
 
     try {
-      await sample.program.updateSheets(mocks.cmd, mocks.event.context, mocks.event.callback)
+      await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
     } catch(err) {
       assert.strictEqual(mocks.event.callback.callCount, 1)
       assert.deepStrictEqual(mocks.event.callback.firstCall.args, [error])
@@ -135,15 +125,63 @@ describe('Sheets update handler', () => {
     }
   })
 
-  it('Passes with a proper event', async () => {
+  it.skip('Handles the sync-tempo command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
 
-    const command = 'sync'
+    const command = 'sync-tempo'
     mocks.cmd.data = makeEventData(command)
 
-    await sample.program.updateSheets(mocks.cmd, mocks.event.context, mocks.event.callback)
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+    assert.strictEqual(mocks.event.callback.callCount, 1)
+    assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
+  })
+
+  it.skip('Handles the report-sheets command', async () => {
+    const sample = getSample()
+    const mocks = getMocks()
+
+    const command = 'report-sheets'
+    mocks.cmd.data = makeEventData(command)
+
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+    assert.strictEqual(mocks.event.callback.callCount, 1)
+    assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
+  })
+
+  it('Handles the notifications-inform command', async () => {
+    const sample = getSample()
+    const mocks = getMocks()
+
+    const command = 'notifications-inform'
+    mocks.cmd.data = makeEventData(command)
+
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+    assert.strictEqual(mocks.event.callback.callCount, 1)
+    assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
+  })
+
+  it('Handles the notifications-warn command', async () => {
+    const sample = getSample()
+    const mocks = getMocks()
+
+    const command = 'notifications-warn'
+    mocks.cmd.data = makeEventData(command)
+
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+    assert.strictEqual(mocks.event.callback.callCount, 1)
+    assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
+  })
+
+  it('Handles the notifications-alert command', async () => {
+    const sample = getSample()
+    const mocks = getMocks()
+
+    const command = 'notifications-alert'
+    mocks.cmd.data = makeEventData(command)
+
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
     assert.strictEqual(mocks.event.callback.callCount, 1)
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })

@@ -8,7 +8,7 @@
     "ops:gcloud:connect": "gcloud config configurations activate gunio-tools && gcloud auth configure-docker",
     "ops:gcloud:setup": "gcloud config configurations create gunio-tools && gcloud auth login && npm run ops:gcloud:config",
     "publish:slackHandler": "gcloud functions deploy tempo-tools --entry-point slackCommands --runtime nodejs10 --trigger-http",
-    "publish:pubsubHandler": "gcloud functions deploy tempo-sheets-sync --entry-point updateSheets --runtime nodejs10 --trigger-topic tempo-tools",
+    "publish:pubsubHandler": "gcloud functions deploy tempo-tools-event-handler --entry-point pubsubHandler --runtime nodejs10 --trigger-topic tempo-tools",
     "publish": "npm publish:slackHandler && npm run publish:pubsubHandler",
     "test": "mocha test/*.test.js --timeout=20000",
     "release": "standard-version"
@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "^2.2.4",
+    "@slack/web-api": "^5.1.0",
     "dotenv": "^8.0.0",
     "googleapis": "^39.2.0",
     "request": "^2.88.0",
