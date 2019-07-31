@@ -44,6 +44,7 @@ slack command to get PDF tempo report
 slack command to get PDF tempo report by Account & Date Range User -> Issue -> Worklog
  * Restrict by [gun.io full members - no multi/single channel guests]
  * Contrain to DM or managment channel
+ * Options for start date & end date
 
 
 -------
