@@ -94,7 +94,7 @@ const makeEventData = (strData) => {
 // beforeEach(tools.stubConsole)
 // afterEach(tools.restoreConsole)
 
-describe.skip('PubSub Handler', () => {
+describe('PubSub Handler', () => {
   it('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
@@ -264,7 +264,7 @@ describe.skip('Slack command handler', () => {
   })
 })
 
-describe('Slack tempo-report command', () => {
+describe.skip('Slack tempo-report command', () => {
   it.skip('Handles search error', async () => {
     const error = new Error('error')
     const mocks = getMocks()

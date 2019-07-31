@@ -14,6 +14,16 @@ const {
   buildSlackMessage,
 } = require('../lib/slack')
 
+const getColor = (balance, inform, warn, alert) => {
+  let color = '#929292'
+  if (balance > inform) color = '#83B972'
+  if (balance < inform && balance > warn) color = '#E6E888'
+  if (balance < warn && balance > alert) color = '#E6C055'
+  if (balance < alert && balance > 0) color = '#E26B6B'
+  if (balance <= 0) color = '#D30000'
+  return color  
+}
+
 const sheetsReport = async () => {
   const report = await getReport('Sheet1!A2:G')
   const update = await Promise.all(report.map(async record => {
@@ -73,7 +83,7 @@ const slackReport = async (req, res) => {
     channel_id,
     channel_name,
     command,
-    text,
+    text: options,
     response_url,
     user_name,
     user_id,
@@ -117,12 +127,40 @@ const slackReport = async (req, res) => {
     alert,
   ] = eligible
 
-  const message = buildSlackMessage(`Tempo Update:
-    Account: ${key}
-    Lead: ${lead}
-    Hours Remaining: ${balance}
+  const color = getColor(balance, inform, warn, alert)
+  const fallback = `Account Manager: ${lead}
+    Last Purchase Date: ${dpurchase}
+    Hours Last Purchased: ${lpurchase}
     Hours Billed Since Last Purchase: ${billed}
-  `)
+    Hours Remaining: ${balance}
+  `
+  const message = buildSlackMessage(`*Tempo Report for ${key}*`,[{
+    color,
+    fallback,
+    fields: [{
+      title: 'Account Manager',
+      value: lead
+    },{
+      title: 'Last Purchase Date',
+      value: dpurchase,
+      short: true,
+    },
+    {
+      title: 'Hours Last Purchased',
+      value: lpurchase,
+      short: true,
+    },
+    {
+      title: 'Hours Billed Since Last Purchase',
+      value: billed,
+      short: true,
+    },
+    {
+      title: 'Hours Remaining',
+      value: balance,
+      short: true,
+    }]
+  }])
 
   if (response_url) {
     request.post({
