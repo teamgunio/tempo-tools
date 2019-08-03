@@ -138,6 +138,19 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
+  it('Handles the sync-stripe command', async () => {
+    const error = new Error('Invalid event data')
+    const sample = getSample()
+    const mocks = getMocks()
+
+    const command = 'sync-stripe'
+    mocks.cmd.data = makeEventData(command)
+
+    await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
+    assert.strictEqual(mocks.event.callback.callCount, 1)
+    assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
+  })
+
   it.skip('Handles the report-sheets command', async () => {
     const sample = getSample()
     const mocks = getMocks()
@@ -150,7 +163,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-inform command', async () => {
+  it.skip('Handles the notifications-inform command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -162,7 +175,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-warn command', async () => {
+  it.skip('Handles the notifications-warn command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -174,7 +187,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-alert command', async () => {
+  it.skip('Handles the notifications-alert command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -186,7 +199,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-update command', async () => {
+  it.skip('Handles the notifications-update command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 

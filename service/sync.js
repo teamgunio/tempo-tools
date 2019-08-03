@@ -4,6 +4,10 @@ const {
 } = require('../lib/tempo')
 
 const {
+  getCustomers,
+} = require('../lib/stripe')
+
+const {
   firestore
 } = require('../lib/firestore')
 
@@ -15,6 +19,10 @@ const syncAccounts = async () => {
       lead: account.lead.displayName
     })
   })
+}
+
+const syncCustomers = async () => {
+  const customers = await getCustomers()
 }
 
 const syncWorklogs = async () => {
@@ -52,5 +60,6 @@ const syncWorklogs = async () => {
 
 module.exports = {
   syncAccounts,
+  syncCustomers,
   syncWorklogs,
 }
