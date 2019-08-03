@@ -49,7 +49,7 @@ const syncPayments = async () => {
 
   const startDate = new Date(latestPayment.get('created').toDate())
   const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
-  const payments = await getPayments(startDate)
+  const payments = await getPayments('1-1-2019')
 
   await Promise.all(payments.map(async payment => {
     const doc = firestore.collection(`payments`).doc(`${payment.id}`)
