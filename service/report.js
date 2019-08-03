@@ -27,7 +27,7 @@ const getColor = (balance, inform, warn, alert) => {
 const sheetsReport = async () => {
   const report = await getReport('Sheet1!A2:G')
   const update = await Promise.all(report.map(async record => {
-    const [
+    let [
       key,
       lead,
       balance,
@@ -43,6 +43,20 @@ const sheetsReport = async () => {
       .where('createdAt', '>=', new Date(dpurchase))
       .get()
 
+    let customer, payment
+    [customer] = (await firestore.collection('customers')
+          .where('metadata.AccountID', '==', key)
+          .get())._docs()
+
+    if (customer) {
+      [payment] = (await firestore.collection('payments')
+                .where('customer', '==', customer.id)
+                .orderBy('created', 'DESC')
+                .limit(1)
+                .get())._docs()
+
+    }
+
     const billings = worklogs._docs()
       .map(l => l.get('hours'))
       .reduce((a, c) => a + c, 0)
@@ -57,6 +71,12 @@ const sheetsReport = async () => {
       .map(l => l.get('hours'))
       .reduce((a, c) => a + c, 0)
 
+    if (payment) {
+      lpurchase = Number(payment.get('metadata.Hours'))
+      dpurchase = payment.get('created').toDate()
+      dpurchase = `${dpurchase.getMonth()+1}/${dpurchase.getDate()}/${dpurchase.getFullYear()}`
+    }
+
     return [
       key,
       account.get('lead'),
@@ -70,11 +90,15 @@ const sheetsReport = async () => {
 
   const leads = update.map(r => [r[1]])
   const tbilled = update.map(r => [r[3]])
+  const lpurchase = update.map(r => [r[4]])
   const billings = update.map(r => [r[5]])
+  const dpurchase = update.map(r => [r[6]])
 
   await updateReport('Sheet1!B2', leads)
   await updateReport('Sheet1!D2', tbilled)
+  await updateReport('Sheet1!E2', lpurchase)
   await updateReport('Sheet1!F2', billings)
+  await updateReport('Sheet1!G2', dpurchase)
 }
 
 const slackReport = async (req, res) => {

@@ -138,7 +138,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the sync-stripe command', async () => {
+  it.skip('Handles the sync-stripe command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
@@ -151,7 +151,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   }).timeout(240000)
 
-  it.skip('Handles the report-sheets command', async () => {
+  it('Handles the report-sheets command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
