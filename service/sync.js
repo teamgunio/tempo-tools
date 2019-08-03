@@ -5,6 +5,7 @@ const {
 
 const {
   getCustomers,
+  getPayments,
 } = require('../lib/stripe')
 
 const {
@@ -22,7 +23,41 @@ const syncAccounts = async () => {
 }
 
 const syncCustomers = async () => {
-  const customers = await getCustomers()
+  const [latestCustomer] = (await firestore.collection(`customers`)
+                                  .orderBy('created', 'desc')
+                                  .limit(1)
+                                  .get())._docs()
+
+  const startDate = new Date(latestCustomer.get('created').toDate())
+  const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
+  const customers = await getCustomers(startDate)
+
+  await Promise.all(customers.map(async customer => {
+    const doc = firestore.collection(`customers`).doc(`${customer.id}`)
+    await doc.set({
+      ...customer,
+      created: new Date(Number(customer.created) * 1000)
+    })
+  }))
+}
+
+const syncPayments = async () => {
+  const [latestPayment] = (await firestore.collection(`payments`)
+                                  .orderBy('created', 'desc')
+                                  .limit(1)
+                                  .get())._docs()
+
+  const startDate = new Date(latestPayment.get('created').toDate())
+  const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
+  const payments = await getPayments(startDate)
+
+  await Promise.all(payments.map(async payment => {
+    const doc = firestore.collection(`payments`).doc(`${payment.id}`)
+    await doc.set({
+      ...payment,
+      created: new Date(Number(payment.created) * 1000)
+    })
+  }))
 }
 
 const syncWorklogs = async () => {
@@ -61,5 +96,6 @@ const syncWorklogs = async () => {
 module.exports = {
   syncAccounts,
   syncCustomers,
+  syncPayments,
   syncWorklogs,
 }

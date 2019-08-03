@@ -9,6 +9,7 @@ const EVENT_TOPIC = 'projects/gunio-tools/topics/tempo-tools'
 const {
   syncAccounts,
   syncCustomers,
+  syncPayments,
   syncWorklogs,
 } = require('./service/sync')
 
@@ -84,6 +85,7 @@ const pubsubHandler = async (event, context, callback) => {
       break
       case 'sync-stripe':
         await syncCustomers()
+        await syncPayments()
       break
       case 'report-sheets':
         await sheetsReport()

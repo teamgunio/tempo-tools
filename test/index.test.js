@@ -95,7 +95,7 @@ const makeEventData = (strData) => {
 // afterEach(tools.restoreConsole)
 
 describe('PubSub Handler', () => {
-  it('Event fails if not the right resource', async () => {
+  it.skip('Event fails if not the right resource', async () => {
     const error = new Error('Invalid event resource')
     const sample = getSample()
     const mocks = getMocks()
@@ -110,7 +110,7 @@ describe('PubSub Handler', () => {
     }
   })
 
-  it('Event fails if there is no data', async () => {
+  it.skip('Event fails if there is no data', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
@@ -149,7 +149,7 @@ describe('PubSub Handler', () => {
     await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
     assert.strictEqual(mocks.event.callback.callCount, 1)
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
-  })
+  }).timeout(240000)
 
   it.skip('Handles the report-sheets command', async () => {
     const sample = getSample()
