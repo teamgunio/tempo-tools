@@ -42,17 +42,15 @@ const syncCustomers = async () => {
 }
 
 const syncPayments = async () => {
-  // const [latestPayment] = (await firestore.collection(`payments`)
-  //                                 .orderBy('created', 'desc')
-  //                                 .limit(1)
-  //                                 .get())._docs()
+  const [latestPayment] = (await firestore.collection(`payments`)
+                                  .orderBy('created', 'desc')
+                                  .limit(1)
+                                  .get())._docs()
 
-  // const startDate = new Date(latestPayment.get('created').toDate())
-  // const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
+  const startDate = new Date(latestPayment.get('created').toDate())
+  const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
 
-  // Back-filling of payment metadata is ongoing, so we need to keep
-  // capturing back to the first of the year
-  const payments = await getPayments('1-1-2019')
+  const payments = await getPayments(dateFrom)
 
   await Promise.all(payments.map(async payment => {
     const doc = firestore.collection(`payments`).doc(`${payment.id}`)

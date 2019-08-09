@@ -24,8 +24,53 @@ const getColor = (balance, inform, warn, alert) => {
   return color  
 }
 
+const sheetsBillings = async () => {
+  const billings = await getReport('InitialHours!A2:D')
+  const customers = (await firestore.collection('customers').get())._docs()
+    .filter(customer => customer.get('metadata.AccountID'))
+    .map(customer => ({
+      id: customer.id,
+      key: customer.get('metadata.AccountID')
+    }))
+
+  let update = await Promise.all(customers.map(async customer => {
+    const payments = (await firestore.collection('payments')
+      .where('customer', '==', customer.id)
+      .get())._docs()
+
+    const records = []
+    const seen = {}
+    for (payment of payments) {
+      seen[payment.id] = true
+
+      const date = payment.get('created').toDate()
+
+      records.push([
+        customer.key,
+        payment.get('metadata.Hours'),
+        `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`,
+        payment.id
+      ])
+    }
+
+    const logs = billings.filter(row => (row[0] === customer.key && !seen[row[3]]))
+    return records.concat(logs)
+  }))
+
+  update = update.filter(r => r[0] && r[0].length)
+  
+  let records = []
+  update.forEach(r => {
+    records = records.concat(r)
+  })
+
+  await updateReport('RawHours!A2:D', records)
+}
+
 const sheetsReport = async () => {
-  const report = await getReport('Sheet1!A2:G')
+  await sheetsBillings()
+
+  const report = await getReport('Report!A2:G')
   const update = await Promise.all(report.map(async record => {
     let [
       key,
@@ -94,11 +139,11 @@ const sheetsReport = async () => {
   const billings = update.map(r => [r[5]])
   const dpurchase = update.map(r => [r[6]])
 
-  await updateReport('Sheet1!B2', leads)
-  await updateReport('Sheet1!D2', tbilled)
-  await updateReport('Sheet1!E2', lpurchase)
-  await updateReport('Sheet1!F2', billings)
-  await updateReport('Sheet1!G2', dpurchase)
+  await updateReport('Report!B2', leads)
+  await updateReport('Report!D2', tbilled)
+  // await updateReport('Report!E2', lpurchase)
+  await updateReport('Report!F2', billings)
+  // await updateReport('Report!G2', dpurchase)
 }
 
 const slackReport = async (req, res) => {
@@ -124,7 +169,7 @@ const slackReport = async (req, res) => {
   const accountKey = channel.name.split('-').shift().toUpperCase()
   console.log(`Building report for ${accountKey}`)
 
-  const report = await getReport('Sheet1!A2:J')
+  const report = await getReport('Report!A2:J')
   const [eligible] = report.filter(r => r[0] === accountKey).map(r => [
     r[0],
     r[1],

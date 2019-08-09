@@ -131,3 +131,9 @@ This account has exceeded the threshold:
 new scheduled job - every 48h - when balance is 0 or less than 0
 
 restrict slack command for report
+
+
+-----
+All the things line up at June 1
+Total hours billed starts at June 1; and we can add starting balances to Sheet2
+Hours billed should only pull from Tempo June 1 forward
