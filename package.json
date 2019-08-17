@@ -41,6 +41,7 @@
     "@google-cloud/firestore": "^2.2.4",
     "@slack/web-api": "^5.1.0",
     "dotenv": "^8.0.0",
+    "fast-xml-parser": "^3.12.20",
     "googleapis": "^39.2.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",

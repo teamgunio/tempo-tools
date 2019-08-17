@@ -125,7 +125,7 @@ describe('PubSub Handler', () => {
     }
   })
 
-  it.skip('Handles the sync-tempo command', async () => {
+  it('Handles the sync-tempo command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
@@ -136,7 +136,7 @@ describe('PubSub Handler', () => {
     await sample.program.pubsubHandler(mocks.cmd, mocks.event.context, mocks.event.callback)
     assert.strictEqual(mocks.event.callback.callCount, 1)
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
-  })
+  }).timeout(240000)
 
   it.skip('Handles the sync-stripe command', async () => {
     const error = new Error('Invalid event data')
@@ -151,7 +151,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   }).timeout(240000)
 
-  it('Handles the report-sheets command', async () => {
+  it.skip('Handles the report-sheets command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 

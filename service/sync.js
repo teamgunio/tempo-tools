@@ -69,29 +69,14 @@ const syncWorklogs = async () => {
 
   const startDate = new Date(latestWorklog.get('createdAt').toDate())
   const dateFrom = `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`
-  const worklogs = (await getWorklogs(null, dateFrom)).results
+  const worklogs = await getWorklogs(null, dateFrom)
 
-  await worklogs.map(async worklog => {
-    const {
-      issue,
-      createdAt,
-      updatedAt,
-      tempoWorklogId,
-      billableSeconds,
-    } = worklog
-
-    const doc = firestore.collection(`worklogs`).doc(`${tempoWorklogId}`)
-    const hours = ((billableSeconds/60)/60)
-    const [account] = issue.key.split('-')
-
+  await Promise.all(worklogs.map(async worklog => {
+    const doc = firestore.collection(`worklogs`).doc(`${worklog.tempoWorklogId}`)
     await doc.set({
       ...worklog,
-      hours,
-      account,
-      createdAt: new Date(createdAt),
-      updatedAt: new Date(updatedAt),
     })
-  })
+  }))
 }
 
 module.exports = {
