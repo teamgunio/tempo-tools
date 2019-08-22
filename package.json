@@ -8,7 +8,7 @@
     "ops:gcloud:connect": "gcloud config configurations activate gunio-tools && gcloud auth configure-docker",
     "ops:gcloud:setup": "gcloud config configurations create gunio-tools && gcloud auth login && npm run ops:gcloud:config",
     "publish:slackHandler": "gcloud alpha functions deploy tempo-tools-slack-command --entry-point slackCommands --runtime nodejs10 --vpc-connector static-egress --egress-settings all --trigger-http",
-    "publish:pubsubHandler": "gcloud alpha functions deploy tempo-tools-event-handler --entry-point pubsubHandler --runtime nodejs10 --vpc-connector static-egress --egress-settings all--trigger-topic tempo-tools",
+    "publish:pubsubHandler": "gcloud alpha functions deploy tempo-tools-event-handler --entry-point pubsubHandler --runtime nodejs10 --vpc-connector static-egress --egress-settings all --trigger-topic tempo-tools",
     "publish": "npm run publish:slackHandler && npm run publish:pubsubHandler",
     "test": "mocha test/*.test.js --timeout=20000",
     "release": "standard-version"
