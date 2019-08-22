@@ -22,7 +22,7 @@ const getColor = (balance, inform, warn, alert) => {
 }
 
 const accountThresholdNotification = async (level='inform') => {
-  const report = await getReport('Sheet1!A2:J')
+  const report = await getReport('Report!A2:K')
   const eligible = report.map(r => [
     r[0],
     r[1],
@@ -34,6 +34,7 @@ const accountThresholdNotification = async (level='inform') => {
     Number(r[7]),
     Number(r[8]),
     Number(r[9]),
+    r[10],
   ])
 
   let list = []
@@ -67,11 +68,12 @@ const accountThresholdNotification = async (level='inform') => {
       inform,
       warn,
       alert,
+      name,
     ] = record
 
     if (!key) return
 
-    const channels = await getAccountChannels(key)
+    const channels = await getAccountChannels(name || key)
     if (!channels) return
 
     const color = getColor(balance, inform, warn, alert)
@@ -84,7 +86,7 @@ const accountThresholdNotification = async (level='inform') => {
       Hours Remaining: ${balance}
     `
 
-    const message = buildSlackMessage(`*Tempo Alert for ${key}*`,[{
+    const message = buildSlackMessage(`*Tempo Alert for ${name || key}*`,[{
       text,
       color,
       fallback,
@@ -119,7 +121,7 @@ const accountThresholdNotification = async (level='inform') => {
 }
 
 const accountUpdateNotification = async () => {
-  const report = await getReport('Sheet1!A2:J')
+  const report = await getReport('Report!A2:K')
   const eligible = report.map(r => [
     r[0],
     r[1],
@@ -131,6 +133,7 @@ const accountUpdateNotification = async () => {
     Number(r[7]),
     Number(r[8]),
     Number(r[9]),
+    r[10],
   ])
 
   await Promise.all(eligible.map(async record => {
@@ -145,11 +148,12 @@ const accountUpdateNotification = async () => {
       inform,
       warn,
       alert,
+      name,
     ] = record
 
     if (!key) return
 
-    const channels = await getAccountChannels(key)
+    const channels = await getAccountChannels(name || key)
     if (!channels) return
 
     const color = getColor(balance, inform, warn, alert)
@@ -159,7 +163,7 @@ const accountUpdateNotification = async () => {
       Hours Billed Since Last Purchase: ${billed}
       Hours Remaining: ${balance}
     `
-    const message = buildSlackMessage(`*Tempo Report Update for ${key}*`,[{
+    const message = buildSlackMessage(`*Tempo Report Update for ${name || key}*`,[{
       color,
       fallback,
       fields: [{

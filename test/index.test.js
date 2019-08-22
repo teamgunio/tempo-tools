@@ -125,7 +125,7 @@ describe('PubSub Handler', () => {
     }
   })
 
-  it('Handles the sync-tempo command', async () => {
+  it.skip('Handles the sync-tempo command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
@@ -199,7 +199,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it.skip('Handles the notifications-update command', async () => {
+  it('Handles the notifications-update command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
