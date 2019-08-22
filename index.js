@@ -23,6 +23,10 @@ const {
   accountUpdateNotification,
 } = require('./service/notification')
 
+const {
+  checkIP,
+} = require('./service/egress')
+
 const commands = ['/tempo-report']
 
 const validateSlackCommand = (body) => {
@@ -111,7 +115,13 @@ const pubsubHandler = async (event, context, callback) => {
   }
 }
 
+const egressCheck = async (req, res) => {
+  const ip = await checkIP()
+  res.status(200).send(ip)
+}
+
 exports = module.exports = {
   slackCommands,
   pubsubHandler,
+  egressCheck,
 }
