@@ -94,7 +94,7 @@ const makeEventData = (strData) => {
 // beforeEach(tools.stubConsole)
 // afterEach(tools.restoreConsole)
 
-describe('Egress Check', () => {
+describe.skip('Egress Check', () => {
   it(`It can check it's own IP`, async () => {
     const sample = getSample()
     const mocks = getMocks()
@@ -138,7 +138,7 @@ describe('PubSub Handler', () => {
     }
   })
 
-  it.skip('Handles the sync-tempo command', async () => {
+  it('Handles the sync-tempo command', async () => {
     const error = new Error('Invalid event data')
     const sample = getSample()
     const mocks = getMocks()
