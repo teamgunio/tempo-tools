@@ -22,7 +22,7 @@ const getColor = (balance, inform, warn, alert) => {
 }
 
 const accountThresholdNotification = async (level='inform') => {
-  const report = await getReport('Report!A2:K')
+  const report = await getReport('Report!A2:L')
   const eligible = report.map(r => [
     r[0],
     r[1],
@@ -35,6 +35,7 @@ const accountThresholdNotification = async (level='inform') => {
     Number(r[8]),
     Number(r[9]),
     r[10],
+    r[11],
   ])
 
   let list = []
@@ -69,9 +70,11 @@ const accountThresholdNotification = async (level='inform') => {
       warn,
       alert,
       name,
+      notifications,
     ] = record
 
     if (!key) return
+    if (notifications !== 'Yes') return
 
     const channels = await getAccountChannels(name || key)
     if (!channels) return
@@ -121,7 +124,7 @@ const accountThresholdNotification = async (level='inform') => {
 }
 
 const accountUpdateNotification = async () => {
-  const report = await getReport('Report!A2:K')
+  const report = await getReport('Report!A2:L')
   const eligible = report.map(r => [
     r[0],
     r[1],
@@ -134,6 +137,7 @@ const accountUpdateNotification = async () => {
     Number(r[8]),
     Number(r[9]),
     r[10],
+    r[11],
   ])
 
   await Promise.all(eligible.map(async record => {
@@ -149,9 +153,11 @@ const accountUpdateNotification = async () => {
       warn,
       alert,
       name,
+      notifications,
     ] = record
 
     if (!key) return
+    if (notifications !== 'Yes') return
 
     const channels = await getAccountChannels(name || key)
     if (!channels) return
