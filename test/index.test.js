@@ -188,7 +188,7 @@ describe('PubSub Handler', () => {
     assert.deepStrictEqual(mocks.event.callback.firstCall.args, [])
   })
 
-  it('Handles the notifications-warn command', async () => {
+  it.skip('Handles the notifications-warn command', async () => {
     const sample = getSample()
     const mocks = getMocks()
 
@@ -290,7 +290,7 @@ describe.skip('Slack command handler', () => {
   })
 })
 
-describe.skip('Slack tempo-report command', () => {
+describe('Slack tempo-report command', () => {
   it.skip('Handles search error', async () => {
     const error = new Error('error')
     const mocks = getMocks()

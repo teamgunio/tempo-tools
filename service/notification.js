@@ -36,6 +36,8 @@ const accountThresholdNotification = async (level='inform') => {
     Number(r[9]),
     r[10],
     r[11],
+    r[12],
+    r[13]
   ])
 
   let list = []
@@ -71,6 +73,8 @@ const accountThresholdNotification = async (level='inform') => {
       alert,
       name,
       notifications,
+      planName,
+      planIncrement,
     ] = record
 
     if (!key) return
@@ -80,51 +84,52 @@ const accountThresholdNotification = async (level='inform') => {
     if (!channels) return
 
     const color = getColor(balance, inform, warn, alert)
-    const text = `This account has less than ${threshold} of the balance remaining.`
-    const fallback = `${text}
-      Account Manager: ${lead}
-      Last Purchase Date: ${dpurchase}
-      Hours Last Purchased: ${lpurchase}
-      Hours Billed Since Last Purchase: ${billed}
-      Hours Remaining: ${balance}
-    `
+    let text, planText = '', instructions
 
-    const message = buildSlackMessage(`*Tempo Alert for ${name || key}*`,[{
-      text,
+    if (planName) {
+      planText = `*Plan:* ${planName === 'Monthly' ? planIncrement+' hours per month' : planName+' - '+planIncrement+' hours'}`
+    }
+
+    instructions = '(DM or @channel for support, reporting requests, and to modify your current plan)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+`
+    const prodMessage = buildSlackMessage(`*Tempo Alert for ${name || key}*`,[{
+      fallback: text,
       color,
-      fallback,
-      fields: [{
-        title: 'Account Manager',
-        value: lead
-      },{
-        title: 'Last Purchase Date',
-        value: dpurchase,
-        short: true,
-      },
-      {
-        title: 'Hours Last Purchased',
-        value: lpurchase,
-        short: true,
-      },
-      {
-        title: 'Hours Billed Since Last Purchase',
-        value: billed,
-        short: true,
-      },
-      {
-        title: 'Hours Remaining',
-        value: balance,
-        short: true,
-      }]
+      text,
     }])
 
-    if (channels.dev) await postMessage(channels.dev.id, message)
-    if (channels.prod) await postMessage(channels.prod.id, message)
+    instructions = '(DM or @channel for support)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+`
+
+    const devMessage = buildSlackMessage(`*Tempo Alert for ${name || key}*`,[{
+      fallback: text,
+      color,
+      text,
+      fields: [{
+        title: 'Last Replenish',
+        value: `${lpurchase} hours added ${dpurchase}`,
+      },
+      {
+        title: 'Hours Billed Since Last Replenish',
+        value: billed,
+      }],
+    }])
+
+    if (channels.dev) await postMessage(channels.dev.id, devMessage)
+    if (channels.prod) await postMessage(channels.prod.id, prodMessage)
   }))
 }
 
 const accountUpdateNotification = async () => {
-  const report = await getReport('Report!A2:L')
+  const report = await getReport('Report!A2:N')
   const eligible = report.map(r => [
     r[0],
     r[1],
@@ -138,6 +143,8 @@ const accountUpdateNotification = async () => {
     Number(r[9]),
     r[10],
     r[11],
+    r[12],
+    r[13]
   ])
 
   await Promise.all(eligible.map(async record => {
@@ -154,6 +161,8 @@ const accountUpdateNotification = async () => {
       alert,
       name,
       notifications,
+      planName,
+      planIncrement,
     ] = record
 
     if (!key) return
@@ -163,42 +172,47 @@ const accountUpdateNotification = async () => {
     if (!channels) return
 
     const color = getColor(balance, inform, warn, alert)
-    const fallback = `Account Manager: ${lead}
-      Last Purchase Date: ${dpurchase}
-      Hours Last Purchased: ${lpurchase}
-      Hours Billed Since Last Purchase: ${billed}
-      Hours Remaining: ${balance}
-    `
-    const message = buildSlackMessage(`*Tempo Report Update for ${name || key}*`,[{
+
+    let text, planText = '', instructions
+
+    if (planName) {
+      planText = `*Plan:* ${planName === 'Monthly' ? planIncrement+' hours per month' : planName+' - '+planIncrement+' hours'}`
+    }
+
+    instructions = '(DM or @channel for support, reporting requests, and to modify your current plan)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+`
+    const prodMessage = buildSlackMessage(`*Tempo Report Update for ${name || key}*`,[{
+      fallback: text,
       color,
-      fallback,
+      text,
+    }])
+
+    instructions = '(DM or @channel for support)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+`
+    const devMessage = buildSlackMessage(`*Tempo Report Update for ${name || key}*`,[{
+      fallback: text,
+      color,
+      text,
       fields: [{
-        title: 'Account Manager',
-        value: lead
-      },{
-        title: 'Last Purchase Date',
-        value: dpurchase,
-        short: true,
+        title: 'Last Replenish',
+        value: `${lpurchase} hours added ${dpurchase}`,
       },
       {
-        title: 'Hours Last Purchased',
-        value: lpurchase,
-        short: true,
-      },
-      {
-        title: 'Hours Billed Since Last Purchase',
+        title: 'Hours Billed Since Last Replenish',
         value: billed,
-        short: true,
-      },
-      {
-        title: 'Hours Remaining',
-        value: balance,
-        short: true,
-      }]
+      }],
     }])
     
-    if (channels.dev) await postMessage(channels.dev.id, message)
-    if (channels.prod) await postMessage(channels.prod.id, message)
+    if (channels.dev) await postMessage(channels.dev.id, devMessage)
+    if (channels.prod) await postMessage(channels.prod.id, prodMessage)
   }))
 }
 

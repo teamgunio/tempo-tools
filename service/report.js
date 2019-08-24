@@ -181,6 +181,10 @@ const slackReport = async (req, res) => {
     Number(r[7]),
     Number(r[8]),
     Number(r[9]),
+    r[10],
+    r[11],
+    r[12],
+    r[13]
   ])
 
   const [
@@ -194,44 +198,56 @@ const slackReport = async (req, res) => {
     inform,
     warn,
     alert,
+    name,
+    notifications,
+    planName,
+    planIncrement,
   ] = eligible
 
   const color = getColor(balance, inform, warn, alert)
-  const fallback = `Account Manager: ${lead}
-    Last Purchase Date: ${dpurchase}
-    Hours Last Purchased: ${lpurchase}
-    Hours Billed Since Last Purchase: ${billed}
-    Hours Remaining: ${balance}
-  `
-  const message = buildSlackMessage(`*Tempo Report for ${key}*`,[{
-    color,
-    fallback,
-    fields: [{
-      title: 'Account Manager',
-      value: lead
-    },{
-      title: 'Last Purchase Date',
-      value: dpurchase,
-      short: true,
-    },
-    {
-      title: 'Hours Last Purchased',
-      value: lpurchase,
-      short: true,
-    },
-    {
-      title: 'Hours Billed Since Last Purchase',
-      value: billed,
-      short: true,
-    },
-    {
-      title: 'Hours Remaining',
-      value: balance,
-      short: true,
-    }]
-  }])
 
-  if (response_url) {
+  let text, planText = '', instructions, message
+
+  if (planName) {
+    planText = `*Plan:* ${planName === 'Monthly' ? planIncrement+' hours per month' : planName+' - '+planIncrement+' hours'}`
+  }
+
+  if (/-dev$/.test(channel.name)) {
+    instructions = '(DM or @channel for support)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+  `
+    message = buildSlackMessage(`*Tempo Report for ${name || key}*`,[{
+      fallback: text,
+      color,
+      text,
+      fields: [{
+        title: 'Last Replenish',
+        value: `${lpurchase} hours added ${dpurchase}`,
+      },
+      {
+        title: 'Hours Billed Since Last Replenish',
+        value: billed,
+      }],
+    }])
+  } else if (/-prod$/.test(channel.name)) {
+
+    instructions = '(DM or @channel for support, reporting requests, and to modify your current plan)'
+    text = `*Gun.io Point of Contact:* ${lead}
+${instructions}
+*Hours Remaining:* ${balance}
+${planText}
+  `
+    message = buildSlackMessage(`*Tempo Report for ${name || key}*`,[{
+      fallback: text,
+      color,
+      text,
+    }])
+  }
+
+  if (message && response_url) {
     request.post({
       uri: response_url,
       json: {
