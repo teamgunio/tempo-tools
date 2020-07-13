@@ -35,7 +35,7 @@
     "mocha": "^6.1.4",
     "proxyquire": "^2.1.0",
     "sinon": "^7.2.7",
-    "standard-version": "^6.0.1"
+    "standard-version": "^8.0.1"
   },
   "dependencies": {
     "@google-cloud/firestore": "^2.2.4",
